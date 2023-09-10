@@ -58,5 +58,5 @@ CREATE TABLE IF NOT EXISTS content.person_film_work
     created_at   timestamp with time zone
 );
 
-create unique index film_work_person_role
-    on content.person_film_work (film_work_id, person_id, role);
+CREATE UNIQUE INDEX film_work_person_role
+    ON content.person_film_work (film_work_id, person_id, role);
