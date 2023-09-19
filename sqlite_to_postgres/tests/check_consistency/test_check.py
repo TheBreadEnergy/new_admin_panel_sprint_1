@@ -1,19 +1,24 @@
-import sqlite3
-import psycopg2
 import os
+import sqlite3
 from datetime import datetime
+
+import psycopg2
+
+from sqlite_to_postgres.config import dsl
 
 
 def get_sqlite_count(connection, table_name):
     cursor = connection.cursor()
     cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-    return cursor.fetchone()[0]
+    result = cursor.fetchone()[0]
+    return result
 
 
 def get_pg_count(connection, table_name):
     cursor = connection.cursor()
     cursor.execute(f"SELECT COUNT(*) FROM content.{table_name}")
-    return cursor.fetchone()[0]
+    result = cursor.fetchone()[0]
+    return result
 
 
 def compare_counts(sqlite_count, pg_count, table_name):
@@ -25,6 +30,7 @@ def extract_column_names(connection, table_name):
     cursor = connection.cursor()
     cursor.execute(f"PRAGMA table_info({table_name})")
     columns = cursor.fetchall()
+    cursor.close()
     return [column[1] for column in columns]
 
 
@@ -35,6 +41,7 @@ def extract_pg_column_names(connection, table_name, schema='content'):
              f"WHERE table_schema = '{schema}' AND table_name = '{table_name}';")
     cursor.execute(query)
     columns = cursor.fetchall()
+    cursor.close()
     return [column[0] for column in columns]
 
 
@@ -43,7 +50,7 @@ def get_sqlite_data(connection, table_name):
     cursor = connection.cursor()
     cursor.execute(f"SELECT * FROM {table_name}")
     rows = cursor.fetchall()
-
+    cursor.close()
     return [dict(zip(columns, row)) for row in rows]
 
 
@@ -52,7 +59,7 @@ def get_pg_data(connection, table_name, schema='content'):
     cursor = connection.cursor()
     cursor.execute(f"SELECT * FROM {schema}.{table_name}")
     rows = cursor.fetchall()
-
+    cursor.close()
     return [dict(zip(columns, row)) for row in rows]
 
 
@@ -111,7 +118,6 @@ def test_data_integrity():
     base_directory = os.getcwd().split("sqlite_to_postgres")[0] + "sqlite_to_postgres"
     path_to_sqlite = os.path.join(base_directory, 'db.sqlite')
     sqlite_conn = sqlite3.connect(path_to_sqlite)
-    dsl = {'dbname': 'movies_database', 'user': 'app', 'password': '123qwe', 'host': '127.0.0.1', 'port': 5432}
     pg_conn = psycopg2.connect(**dsl)
 
     tables = ["genre", "film_work", "person", "genre_film_work", "person_film_work"]

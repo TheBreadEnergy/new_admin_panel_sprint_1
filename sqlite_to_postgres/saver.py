@@ -1,7 +1,9 @@
-from typing import List, Any
+from typing import Any, List
 
 import psycopg2
 from psycopg2.extensions import connection as _connection
+
+from config import logger
 
 
 class PostgresSaver:
@@ -33,5 +35,6 @@ class PostgresSaver:
         try:
             cursor.execute(query)
         except psycopg2.Error as e:
-            print(f"Ошибка при вставке в {table_name}. Ошибка: {e}")
+            logger.error(f"Ошибка при вставке в {table_name}. Ошибка: {e}")
         self.connection.commit()
+        cursor.close()
