@@ -44,10 +44,12 @@ class GenreFilmwork(UUIDMixin):
         db_table = "content\".\"genre_film_work"
         verbose_name = 'Жанр кинопроизведения'
         verbose_name_plural = 'Жанры кинопроизведения'
+        constraints = [
+            models.UniqueConstraint(fields=['film_work', 'genre'], name='filmwork_genre_unique')
+        ]
         indexes = [
             models.Index(fields=['film_work'], name='film_work_idx'),
-            models.Index(fields=['genre'], name='genre_idx'),
-            models.Index(fields=['film_work', 'genre'], name='filmwork_genre_idx')
+            models.Index(fields=['genre'], name='genre_idx')
         ]
 
     def __str__(self):
@@ -89,10 +91,12 @@ class PersonFilmwork(UUIDMixin):
         db_table = "content\".\"person_film_work"
         verbose_name = 'Участник кинопроизведения'
         verbose_name_plural = 'Участники кинопроизведения'
+        constraints = [
+            models.UniqueConstraint(fields=['film_work', 'person', 'role'], name='film_work_person_role_unique')
+        ]
         indexes = [
             models.Index(fields=['person'], name='person_idx'),
             models.Index(fields=['film_work'], name='filmwork_idx'),
-            models.Index(fields=['person', 'film_work'], name='person_filmwork_idx'),
             models.Index(fields=['role'], name='role_idx'),
         ]
 
